@@ -1,4 +1,7 @@
 # HX711
+**BEWARE! I renamed a bunch of methods more in line with my remembered industrial work. The docs have not yet been updated! **
+
+
 An Arduino library to interface the [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]
 for reading load cells / weight scales.
 
