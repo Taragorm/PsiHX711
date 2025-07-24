@@ -301,6 +301,16 @@ long HX711::get_zero() const
 	return _zero;
 }
 //---------------------------------------------------------
+double HX711::get_tare() const
+{
+	return _tare;
+}
+//---------------------------------------------------------
+void HX711::set_tare(double t)
+{
+	_tare = t;
+}
+//---------------------------------------------------------
 void HX711::power_down() 
 {
 	digitalWrite(PD_SCK, LOW);

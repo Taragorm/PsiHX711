@@ -78,6 +78,9 @@ class HX711
 		// get the current _zero
 		long get_zero() const;
 
+		double get_tare() const;
+		void set_tare(double t);
+
 		// puts the chip into power down mode
 		void power_down();
 
