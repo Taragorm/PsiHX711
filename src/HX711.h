@@ -23,11 +23,12 @@
 class HX711
 {
 	private:
-		const byte PD_SCK;	    // Power Down and Serial Clock Input Pin
-		const byte DOUT;		    // Serial Data Output Pin
+		const byte PD_SCK;	// Power Down and Serial Clock Input Pin
+		const byte DOUT;	// Serial Data Output Pin
 		byte _gain;		    // amplification factor
+		long _absolute = 0; // last absolute value
 		long _zero = 0;	    // used for zero weight
-		long _tare = 0;	    // used for zero weight
+		long _tare = 0;	    // used for tare weight
 		double _scale = 1;	// used to return weight in grams, kg, ounces, whatever
 
 	public:
@@ -62,6 +63,8 @@ class HX711
 		// waits for the chip to be ready and returns a reading
 		long read() const;
 
+		/// Poll the scale & store value
+		void poll(byte times=10);
 
 		/// set the SCALE value; this value is used to convert the raw data to "human readable" data (measure units)
         /// Raw value is *multiplied* by this value [altered, was divisor; multiply is cheaper - SDM]
@@ -78,8 +81,8 @@ class HX711
 		// get the current _zero
 		long get_zero() const;
 
-		double get_tare() const;
-		void set_tare(double t);
+		long get_tare() const;
+		void set_tare(long t);
 
 		// puts the chip into power down mode
 		void power_down();
@@ -88,17 +91,17 @@ class HX711
 		void power_up();
         
         
-		// set the _zero value for abs weight; times = how many times to read the tare value
-        void zero(byte times = 10);
+		// set the _zero value for abs weight
+        void zero(byte times=40);
 
-		// set the _tare value for tare weight; times = how many times to read the tare value
-		void tare(byte times = 10);
+		// set the _tare value for tare weight
+		void tare(byte times=40);
         
-        long absolute(byte times = 10) const;
-        long grossRaw(byte times = 10) const;
-        double gross(byte times = 10) const;
-        long nettRaw(byte times = 10) const;
-        double nett(byte times = 10) const;
+        long absolute() const;
+        long grossRaw() const;
+        double gross() const;
+        long nettRaw() const;
+        double nett() const;
 };
 
 #endif /* HX711_h */

@@ -198,9 +198,21 @@ long HX711::read() const
 			| static_cast<unsigned long>(data[1]) << 8
 			| static_cast<unsigned long>(data[0]) );
 
+	
 	return static_cast<long>(value);
 }
-
+//---------------------------------------------------------
+void HX711::poll(byte times)
+{
+	long sum = 0;
+	for (byte i = 0; i < times; i++) {
+		sum += read();
+		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
+		// https://github.com/bogde/HX711/issues/73
+		delay(0);
+	}
+	_absolute =  sum / times;
+}
 //---------------------------------------------------------
 void HX711::wait_ready(unsigned long delay_ms) const
 {
@@ -247,34 +259,28 @@ bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) co
 }
 
 //---------------------------------------------------------
-long HX711::absolute(byte times) const
+long HX711::absolute() const
 {
-	long sum = 0;
-	for (byte i = 0; i < times; i++) {
-		sum += read();
-		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
-		// https://github.com/bogde/HX711/issues/73
-		delay(0);
-	}
-	return sum / times;
+	return _absolute;
 }
 
 //---------------------------------------------------------
-long HX711::grossRaw(byte times) const
+long HX711::grossRaw() const
 {
-	return absolute(times) - _zero;
+	return _absolute - _zero;
 }
 
 //---------------------------------------------------------
-double HX711::gross(byte times) const
+double HX711::gross() const
 {
-	return scale(grossRaw(times));
+	return scale(grossRaw());
 }
 
 //---------------------------------------------------------
 void HX711::tare(byte times)
 {
-	auto ave = absolute(times);
+	poll(times);
+	auto ave = absolute();
 	_tare = ave;
 }
 
@@ -301,12 +307,12 @@ long HX711::get_zero() const
 	return _zero;
 }
 //---------------------------------------------------------
-double HX711::get_tare() const
+long HX711::get_tare() const
 {
 	return _tare;
 }
 //---------------------------------------------------------
-void HX711::set_tare(double t)
+void HX711::set_tare(long t)
 {
 	_tare = t;
 }
@@ -314,7 +320,7 @@ void HX711::set_tare(double t)
 void HX711::power_down() 
 {
 	digitalWrite(PD_SCK, LOW);
-	digitalWrite(PD_SCK, HIGH);
+	//digitalWrite(PD_SCK, HIGH); //?? SDM
 }
 //---------------------------------------------------------
 void HX711::power_up() 
@@ -325,16 +331,17 @@ void HX711::power_up()
 //---------------------------------------------------------
 void HX711::zero(byte times)
 {
-    _zero = absolute(times);
+	poll(times);
+    _tare = _zero = absolute();
 }    
 //---------------------------------------------------------
-long HX711::nettRaw(byte times) const
+long HX711::nettRaw() const
 {
-    return absolute(times) - _tare;
+    return absolute() - _tare;
 }    
 //---------------------------------------------------------
-double HX711::nett(byte times) const
+double HX711::nett() const
 {
-    return scale( nettRaw(times) );
+    return scale( nettRaw() );
 }    
 //---------------------------------------------------------
