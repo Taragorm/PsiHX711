@@ -20,6 +20,14 @@
 #include "WProgram.h"
 #endif
 
+#ifndef HX711_WDT
+#define HX711_WDT 0
+#endif
+
+#if HX711_WDT
+#include <avr/wdt.h>>
+#endif
+
 class HX711
 {
 	private:

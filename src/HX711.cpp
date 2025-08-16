@@ -210,6 +210,9 @@ void HX711::poll(byte times)
 		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
 		// https://github.com/bogde/HX711/issues/73
 		delay(0);
+#if HX711_WDT		
+		wdt_reset();
+#endif
 	}
 	_absolute =  sum / times;
 }
